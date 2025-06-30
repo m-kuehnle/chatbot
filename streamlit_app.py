@@ -10,11 +10,15 @@ st.write(
     "You can also learn how to build this app step by step by [following our tutorial](https://docs.streamlit.io/develop/tutorials/llms/build-conversational-apps)."
 )
 
-# Load the Gemini API key from secrets.toml
-gemini_api_key = st.secrets["general"]["gemini_api_key"]
+# Load the Gemini API key from Streamlit Cloud Secrets.
+gemini_api_key = st.secrets.get("general", {}).get("gemini_api_key")
 if not gemini_api_key:
-    st.error("Gemini API key is missing. Please add it to secrets.toml.", icon="❌")
-else:
+    # Fallback: Ask the user to enter the API key manually.
+    gemini_api_key = st.text_input("Enter your Gemini API Key", type="password")
+    if not gemini_api_key:
+        st.error("Gemini API key is missing. Please provide it to continue.", icon="❌")
+
+if gemini_api_key:
     # Create a Gemini client.
     client = genai.Client(api_key=gemini_api_key)
 
@@ -46,11 +50,9 @@ else:
             ),
         )
 
-        # Display the response and store it in session state.
+        # Extract and display the relevant text from the response.
+        assistant_response = response.candidates[0].content.parts[0].text
         with st.chat_message("assistant"):
-            st.markdown(response.text)
-        st.session_state.messages.append({"role": "assistant", "content": response.text})
-        # session state.
-        with st.chat_message("assistant"):
-            response = st.write_stream(stream)
-        st.session_state.messages.append({"role": "assistant", "content": response})
+            st.markdown(assistant_response)
+        st.session_state.messages.append({"role": "assistant", "content": assistant_response})
+   
