@@ -10,10 +10,10 @@ st.write(
     "You can also learn how to build this app step by step by [following our tutorial](https://docs.streamlit.io/develop/tutorials/llms/build-conversational-apps)."
 )
 
-# Ask user for their Gemini API key via `st.text_input`.
-gemini_api_key = st.text_input("Gemini API Key", type="password")
+# Load the Gemini API key from secrets.toml
+gemini_api_key = st.secrets["general"]["gemini_api_key"]
 if not gemini_api_key:
-    st.info("Please add your Gemini API key to continue.", icon="🗝️")
+    st.error("Gemini API key is missing. Please add it to secrets.toml.", icon="❌")
 else:
     # Create a Gemini client.
     client = genai.Client(api_key=gemini_api_key)
