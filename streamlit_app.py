@@ -54,7 +54,7 @@ Speak softly, with reassuring metaphors and pauses.
 HOTLINE_NOTICE = (
     "**⚠️ It sounds like you may be feeling unsafe right now.**\n\n"
     "You matter, and you don’t have to face these feelings alone. "
-    "Please call the free, confidential crisis hotline **+49 293 283843** right away, "
+    "Please call the free, confidential crisis hotline **+49 800 1110111** right away, "
     "or reach out to a trusted mental-health professional or therapist. "
     "If you think you might act on these thoughts, please call **112** "
     "or go to the nearest hospital."
@@ -68,7 +68,7 @@ def extract_flag(reply: str) -> tuple[bool, str]:
 
 # --- Page setup ---
 st.set_page_config(page_title="Kompana", page_icon="🧠")
-st.title("Kompana – Your Mental-Health Support")
+st.title("Kompana CARE")
 
 # Persona selector (persist in session_state)
 if "persona" not in st.session_state:
@@ -108,11 +108,20 @@ if st.session_state.persona is None:
 # --- After selection: show only current persona & chat UI ---
 st.markdown(f"### Current persona: **{st.session_state.persona}**")
 
-st.write(
-    "Kompana is a compassionate AI mental-health companion powered by Google Gemini. "
-    "I'm here to provide emotional support, coping strategies, and a safe space to talk. "
-    "**Important:** I'm not a replacement for professional therapy. "
-    "If you’re in crisis, please contact emergency services or a mental-health hotline."
+st.markdown(
+    """
+**What I can help with:** 
+- Listening without judgement  
+- Evidence-based coping ideas  
+- Preparing talking points for therapy  
+
+**What I can’t do:** 
+- Diagnose or prescribe  
+- Replace professional treatment  
+
+A licensed clinician may review flagged chats to help keep you safe.
+**⚠️ If you feel you might harm yourself or others, call 112 (DE) or your local emergency number immediately.**
+"""
 )
 
 # --- Chat & Gemini logic ---
@@ -145,7 +154,6 @@ You are Kompana, an AI mental-health companion adopting the following persona:
 
 **CRISIS format:**  
 Start with `EMERGENCY: true` or `EMERGENCY: false`, then a blank line, then your response.
-If `EMERGENCY: true`, your next line MUST advise calling +49 293 283843 or 112 immediately.
 """
     api_msgs = [{"role": "user", "content": system_prompt}] + st.session_state.messages
 
@@ -163,7 +171,7 @@ If `EMERGENCY: true`, your next line MUST advise calling +49 293 283843 or 112 i
         with st.chat_message("assistant"):
             st.markdown(HOTLINE_NOTICE)
         st.session_state.messages.append({"role": "assistant", "content": HOTLINE_NOTICE})
-
-    with st.chat_message("assistant"):
-        st.markdown(assistant_txt)
-    st.session_state.messages.append({"role": "assistant", "content": assistant_txt})
+    else:
+        with st.chat_message("assistant"):
+            st.markdown(assistant_txt)
+        st.session_state.messages.append({"role": "assistant", "content": assistant_txt})
